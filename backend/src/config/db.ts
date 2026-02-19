@@ -8,6 +8,7 @@ export const connectDB = async (): Promise<void> => {
     logger.info('MongoDB connected');
   } catch (error) {
     logger.error('MongoDB connection failed');
+    console.log(error.message);
     process.exit(1);
   }
 };

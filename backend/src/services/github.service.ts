@@ -64,24 +64,19 @@ export const fetchRepoFiles = async (repoUrl: string): Promise<GithubFile[]> => 
     const filePaths = filteredPaths.slice(0, config.maxFilesPerRepo);
     logger.info(`Fetching ${filePaths.length} files from ${owner}/${repo}`);
 
-    const files: GithubFile[] = [];
-
-    for (const path of filePaths) {
+    const files: GithubFile[] = await Promise.all(
+      filePaths.map(async (path) => {
       try {
         const content = await getFileContent(owner, repo, path);
-
-        if (content.length > config.maxFileSizeBytes) {
-          logger.warn(`Skipping ${path} — file too large (${content.length} bytes)`);
-          continue;
-        }
-
-        files.push({ path, content });
-      } catch (err) {
-        logger.warn(`Skipping file ${path} — could not fetch content`);
+        if (content.length > config.maxFileSizeBytes) return null;
+        return { path, content };
+      } catch {
+        return null;
       }
-    }
+    })
+   );
 
-    return files;
+    return files.filter((f): f is GithubFile=> f!==null);
   } catch (err: any) {
     if (err.response?.status === 403) {
       throw new AppError('GitHub rate limit exceeded. Add a GITHUB_TOKEN to .env', 429);

@@ -12,7 +12,7 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-app.use('/api/v1', router);
+app.use('/api', router);
 app.use(errorHandler);
 
 export default app;

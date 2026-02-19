@@ -1,28 +1,14 @@
-import crypto from 'crypto';
 import Groq from 'groq-sdk';
 import { generateSingleEmbedding } from './embedding.service';
 import { queryVectors } from './pinecone.service';
 import { ChunkModel } from '../models/Chunk.model';
 import { RepoModel } from '../models/Repo.model';
-import { CacheModel } from '../models/Cache.model';
 import { AppError } from '../api/middleware/errorHandler';
 import { config } from '../config/index';
 import { logger } from '../utils/logger';
+import { generateCacheKey, getCache, setCache } from '../utils/cache';
 
 const groq = new Groq({ apiKey: config.groqApiKey });
-const CACHE_TTL_HOURS = 24;
-const PROMPT_VERSION = 'v1'; // bump this to invalidate all caches when prompts change
-
-const buildCacheKey = (
-  repoUrl: string,
-  feature: string,
-  target: string,
-  topK: number
-): string =>
-  crypto
-    .createHash('sha256')
-    .update(`${repoUrl}:${feature}:${target}:${topK}:${PROMPT_VERSION}`)
-    .digest('hex');
 
 const callLLM = async (prompt: string): Promise<string> => {
   const response = await groq.chat.completions.create({
@@ -52,7 +38,7 @@ export const ragQuery = async ({
   filePath?: string;
 }): Promise<string> => {
 
-  // Guard: ensure repo is ingested before proceeding
+ 
   const repoDoc = await RepoModel.findOne({ repoUrl });
   if (!repoDoc || repoDoc.status !== 'ingested') {
     throw new AppError(
@@ -61,12 +47,11 @@ export const ragQuery = async ({
     );
   }
 
-  const cacheKey = buildCacheKey(repoUrl, feature, target, topK);
-
-  const cached = await CacheModel.findOne({ cacheKey });
+  const cacheKey = generateCacheKey(feature, repoUrl, target);
+  const cached = await getCache(cacheKey);
   if (cached) {
     logger.info(`Cache hit for ${feature} on ${repoUrl}`);
-    return cached.response;
+    return cached;
   }
 
   logger.info(`Generating query embedding for feature: ${feature}`);
@@ -82,7 +67,7 @@ export const ragQuery = async ({
     );
   }
 
-  // Fetch chunk texts from MongoDB using pineconeIds
+  
   const pineconeIds = vectorResults.map((r) => r.pineconeId);
   const chunkDocs = await ChunkModel.find({ pineconeId: { $in: pineconeIds } });
 
@@ -93,7 +78,7 @@ export const ragQuery = async ({
     );
   }
 
-  // Preserve Pinecone relevance ordering
+  
   const chunkMap = new Map(chunkDocs.map((c) => [c.pineconeId, c]));
   const chunkTexts = vectorResults
     .map((r) => {
@@ -107,12 +92,7 @@ export const ragQuery = async ({
   logger.info(`Calling LLM for feature: ${feature}`);
   const response = await callLLM(prompt);
 
-  const expiresAt = new Date(Date.now() + CACHE_TTL_HOURS * 60 * 60 * 1000);
-  await CacheModel.findOneAndUpdate(
-    { cacheKey },
-    { cacheKey, feature, repoUrl, target, response, expiresAt },
-    { upsert: true }
-  );
+  await setCache(cacheKey, feature, repoUrl, target, response);
 
   return response;
 };

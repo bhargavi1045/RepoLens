@@ -1,6 +1,3 @@
-// Reserved for MongoDB/Mongoose integration
-// Will store analysis results for history tracking and RAG
-
 export interface IAnalysis {
   repoUrl: string;
   issueCount: number;

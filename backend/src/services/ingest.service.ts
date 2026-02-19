@@ -22,7 +22,6 @@ export const ingestRepo = async (
     return { message: 'Repository already ingested. Pass force=true to re-ingest.', chunkCount: 0 };
   }
 
-  // Force re-ingestion: clean up existing data
   if (force && existing) {
     logger.info(`Force re-ingestion for ${owner}/${repo} — cleaning up old data`);
     const existingChunks = await ChunkModel.find({ repoUrl }, { pineconeId: 1 });
@@ -35,7 +34,7 @@ export const ingestRepo = async (
   await RepoModel.findOneAndUpdate(
     { repoUrl },
     { repoUrl, owner, repo, status: 'pending' },
-    { upsert: true, new: true }
+    { upsert: true, returnDocument: 'after' }
   );
 
   try {
@@ -46,7 +45,6 @@ export const ingestRepo = async (
     let skippedFiles = 0;
 
     for (const file of files) {
-      // Skip files that are too large
       if (file.content.length > config.maxFileSizeBytes) {
         logger.warn(`Skipping ${file.path} — exceeds size limit (${file.content.length} bytes)`);
         skippedFiles++;
@@ -57,7 +55,6 @@ export const ingestRepo = async (
       const chunks = chunkFile(sanitized, file.path, repoUrl);
       allChunks.push(...chunks);
 
-      // Abort if total chunks exceed limit
       if (allChunks.length >= config.maxChunksPerRepo) {
         logger.warn(`Chunk limit (${config.maxChunksPerRepo}) reached — stopping early`);
         break;
@@ -73,6 +70,11 @@ export const ingestRepo = async (
     const texts = allChunks.map((c) => c.text);
     const embeddings = await generateEmbeddings(texts);
 
+    logger.info(`Total chunks: ${allChunks.length}`);
+    logger.info(`Total embeddings: ${embeddings.length}`);
+    logger.info(`Sample embedding length: ${embeddings[0]?.length}`);
+    logger.info(`Sample embedding type: ${typeof embeddings[0]?.[0]}`)
+
     const pineconeRecords: PineconeRecord[] = allChunks.map((chunk, i) => ({
       id: `${owner}-${repo}-${chunk.metadata.filePath}-${chunk.metadata.chunkIndex}`.replace(
         /[^a-zA-Z0-9-_]/g,
@@ -83,9 +85,11 @@ export const ingestRepo = async (
         repoUrl,
         filePath: chunk.metadata.filePath,
         chunkIndex: chunk.metadata.chunkIndex,
-        // text intentionally NOT stored in Pinecone — fetched from MongoDB
       },
     }));
+
+    logger.info(`Total records: ${pineconeRecords.length}`);
+    logger.info(`Sample record values length: ${pineconeRecords[0]?.values?.length}`);
 
     await upsertVectors(pineconeRecords);
 
@@ -105,7 +109,8 @@ export const ingestRepo = async (
 
     await RepoModel.findOneAndUpdate(
       { repoUrl },
-      { status: 'ingested', fileCount: files.length, ingestedAt: new Date() }
+      { status: 'ingested', fileCount: files.length, ingestedAt: new Date() },
+      {returnDocument: 'after'}
     );
 
     logger.info(`Ingestion complete for ${owner}/${repo} — ${allChunks.length} chunks`);

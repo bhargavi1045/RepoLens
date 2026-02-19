@@ -6,7 +6,7 @@ export interface IChunk extends Document {
   chunkIndex: number;
   pineconeId: string;
   tokenCount: number;
-  text: string; // full text stored only here, not in Pinecone
+  text: string;
   startChar: number;
   endChar: number;
   createdAt: Date;
@@ -25,6 +25,5 @@ const ChunkSchema = new Schema<IChunk>({
 });
 
 ChunkSchema.index({ repoUrl: 1, filePath: 1 });
-ChunkSchema.index({ pineconeId: 1 });
 
 export const ChunkModel = mongoose.model<IChunk>('Chunk', ChunkSchema);

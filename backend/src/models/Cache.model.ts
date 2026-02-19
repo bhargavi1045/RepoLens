@@ -10,6 +10,7 @@ export interface ICache extends Document {
   expiresAt: Date;
 }
 
+const ONE_DAY = 24 * 60 * 60 * 1000;
 const CacheSchema = new Schema<ICache>({
   cacheKey: { type: String, required: true, unique: true },
   feature: { type: String, required: true },
@@ -17,7 +18,7 @@ const CacheSchema = new Schema<ICache>({
   target: { type: String, default: '' },
   response: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
-  expiresAt: { type: Date, required: true },
+ expiresAt: { type: Date, default: () => new Date(Date.now() + ONE_DAY) },
 });
 
 CacheSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });

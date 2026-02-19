@@ -17,7 +17,7 @@ export const runLLMAnalysis = async (input: LLMAnalysisInput): Promise<LLMAnalys
       model: 'llama-3.3-70b-versatile',
       messages: [{ role: 'user', content: prompt }],
       temperature: 0.3,
-      max_tokens: 1500,
+      max_tokens: 2000,
     });
 
     const raw = response.choices[0]?.message?.content?.trim();

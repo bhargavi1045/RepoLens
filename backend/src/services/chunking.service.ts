@@ -1,6 +1,3 @@
-// Token-approximate chunking — preserves line breaks, code-aware
-// 1 token ≈ 4 characters (conservative estimate for code)
-
 const CHARS_PER_TOKEN = 4;
 const CHUNK_TOKEN_SIZE = 400;
 const OVERLAP_TOKEN_SIZE = 50;
@@ -37,7 +34,6 @@ export const chunkFile = (
   while (start < content.length) {
     let end = start + CHUNK_SIZE;
 
-    // Snap to nearest newline to avoid splitting mid-line
     if (end < content.length) {
       const nextNewline = content.indexOf('\n', end);
       if (nextNewline !== -1 && nextNewline - end < 200) {

@@ -25,7 +25,8 @@ export const generateEmbeddings = async (texts: string[]): Promise<number[][]> =
       inputType: 'search_document',
     });
 
-    const embeddings = response.embeddings as number[][];
+    const raw = response.embeddings as any;
+    const embeddings: number[][] = Array.isArray(raw) ? raw : (raw.float ?? raw.int8 ?? []);
     allEmbeddings.push(...embeddings);
   }
 
@@ -39,5 +40,7 @@ export const generateSingleEmbedding = async (text: string): Promise<number[]> =
     inputType: 'search_query',
   });
 
-  return (response.embeddings as number[][])[0];
+  const raw = response.embeddings as any;
+  const embeddings: number[][] = Array.isArray(raw) ? raw : (raw.float ?? raw.int8 ?? []);
+  return embeddings[0];
 };

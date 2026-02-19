@@ -44,7 +44,6 @@ export const ingestRepoController = async (
   try {
     const { repoUrl, force } = req.body;
 
-    // Skip caching if force = true
     if (!force) {
       const cacheKey = generateCacheKey('ingestRepo', repoUrl);
       const cached = await getCache(cacheKey);

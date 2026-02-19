@@ -13,7 +13,6 @@ export interface PineconeRecord {
     repoUrl: string;
     filePath: string;
     chunkIndex: number;
-    // text is NOT stored here — fetched from MongoDB instead
   };
 }
 
@@ -30,7 +29,18 @@ export const upsertVectors = async (records: PineconeRecord[]): Promise<void> =>
 
   for (let i = 0; i < records.length; i += BATCH_SIZE) {
     const batch = records.slice(i, i + BATCH_SIZE);
-    await index.upsert(batch as any);
+
+    const formattedBatch = batch.map((r) => ({
+      id: r.id,
+      values: Array.from(r.values),
+      metadata: {
+        repoUrl: r.metadata.repoUrl,
+        filePath: r.metadata.filePath,
+        chunkIndex: r.metadata.chunkIndex,
+      },
+    }));
+
+    await index.upsert({ records: formattedBatch });
     logger.info(`Upserted Pinecone batch ${Math.floor(i / BATCH_SIZE) + 1}`);
   }
 };

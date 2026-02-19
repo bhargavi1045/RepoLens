@@ -1,16 +1,23 @@
-import { CacheModel, ICache } from '../models/Cache.model';
 import crypto from 'crypto';
+import { CacheModel } from '../models/Cache.model';
 
-export const generateCacheKey = (feature: string, repoUrl: string, target: string = ''): string => {
-  const hash = crypto.createHash('md5').update(`${feature}-${repoUrl}-${target}`).digest('hex');
-  return hash;
-};
+const PROMPT_VERSION = 'v1'; 
+const DEFAULT_TTL_HOURS = 24;
+
+export const generateCacheKey = (
+  feature: string,
+  repoUrl: string,
+  target: string = ''
+): string =>
+  crypto
+    .createHash('sha256')
+    .update(`${feature}:${repoUrl}:${target}:${PROMPT_VERSION}`)
+    .digest('hex');
 
 export const getCache = async (cacheKey: string): Promise<string | null> => {
   const cache = await CacheModel.findOne({ cacheKey });
   if (!cache) return null;
 
-  // Check expiration
   if (cache.expiresAt < new Date()) {
     await CacheModel.deleteOne({ cacheKey });
     return null;
@@ -19,11 +26,18 @@ export const getCache = async (cacheKey: string): Promise<string | null> => {
   return cache.response;
 };
 
-export const setCache = async (cacheKey: string, feature: string, repoUrl: string, target: string, response: string, ttlSeconds: number = 3600): Promise<void> => {
-  const expiresAt = new Date(Date.now() + ttlSeconds * 1000);
+export const setCache = async (
+  cacheKey: string,
+  feature: string,
+  repoUrl: string,
+  target: string,
+  response: string,
+  ttlHours: number = DEFAULT_TTL_HOURS
+): Promise<void> => {
+  const expiresAt = new Date(Date.now() + ttlHours * 60 * 60 * 1000);
   await CacheModel.findOneAndUpdate(
     { cacheKey },
-    { feature, repoUrl, target, response, expiresAt },
+    { cacheKey, feature, repoUrl, target, response, expiresAt },
     { upsert: true }
   );
 };

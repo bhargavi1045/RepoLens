@@ -11,15 +11,13 @@ export const validateFilePath = async (
     const { repoUrl, filePath } = req.body;
 
     if (!filePath) {
-      return next(); // filePath is optional in some routes
+      return next();
     }
 
-    // Prevent path traversal attacks
     if (filePath.includes('..') || filePath.startsWith('/')) {
       return next(new AppError('Invalid filePath — path traversal not allowed', 400));
     }
 
-    // Verify file actually exists in ingested chunks
     const exists = await ChunkModel.findOne({ repoUrl, filePath });
     if (!exists) {
       return next(

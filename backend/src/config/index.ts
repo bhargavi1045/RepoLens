@@ -13,5 +13,5 @@ export const config = {
   embeddingDimension: 1024,           // Cohere embed-english-v3.0 = 1024
   maxFilesPerRepo: parseInt(process.env.MAX_FILES || '50'),
   maxChunksPerRepo: parseInt(process.env.MAX_CHUNKS || '2000'),
-  maxFileSizeBytes: parseInt(process.env.MAX_FILE_SIZE || '100000'), // 100KB per file
+  maxFileSizeBytes: parseInt(process.env.MAX_FILE_SIZE || '500000'), // 100KB per file
 };
