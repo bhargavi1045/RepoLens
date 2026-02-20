@@ -1,7 +1,6 @@
 import { Pinecone } from '@pinecone-database/pinecone';
 import { config } from '../config/index';
 import { logger } from '../utils/logger';
-import { EMBEDDING_DIMENSION } from './embedding.service';
 
 const pinecone = new Pinecone({ apiKey: config.pineconeApiKey });
 const getIndex = () => pinecone.index(config.pineconeIndex);
@@ -40,8 +39,13 @@ export const upsertVectors = async (records: PineconeRecord[]): Promise<void> =>
       },
     }));
 
-    await index.upsert({ records: formattedBatch });
-    logger.info(`Upserted Pinecone batch ${Math.floor(i / BATCH_SIZE) + 1}`);
+    try {
+      await index.upsert({ records: formattedBatch });
+      logger.info(`Upserted Pinecone batch ${Math.floor(i / BATCH_SIZE) + 1}`);
+    } catch (err: any) {
+      logger.error(`Failed to upsert Pinecone batch ${Math.floor(i / BATCH_SIZE) + 1}: ${err.message}`);
+      throw err;
+    }
   }
 };
 
@@ -90,8 +94,17 @@ export const deleteRepoVectors = async (
 
   for (let i = 0; i < pineconeIds.length; i += BATCH_SIZE) {
     const batch = pineconeIds.slice(i, i + BATCH_SIZE);
-    await index.deleteMany(batch);
-  }
 
-  logger.info(`Deleted ${pineconeIds.length} vectors for ${repoUrl}`);
+    try {
+      await index.deleteMany({
+        ids: batch,
+      });
+
+      logger.info(`Deleted ${batch.length} vectors for ${repoUrl} (batch ${Math.floor(i / BATCH_SIZE) + 1})`);
+    } catch (err: any) {
+      logger.error(`Failed to delete Pinecone batch ${Math.floor(i / BATCH_SIZE) + 1}: ${err.message}`);
+      throw err;
+    }
+  }
 };
+

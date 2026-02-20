@@ -10,8 +10,8 @@ export const config = {
   pineconeApiKey: process.env.PINECONE_API_KEY || '',
   pineconeIndex: process.env.PINECONE_INDEX || 'repolens-chunks',
   cohereApiKey: process.env.COHERE_API_KEY || '',
-  embeddingDimension: 1024,           // Cohere embed-english-v3.0 = 1024
+  embeddingDimension: 1024,          
   maxFilesPerRepo: parseInt(process.env.MAX_FILES || '50'),
   maxChunksPerRepo: parseInt(process.env.MAX_CHUNKS || '2000'),
-  maxFileSizeBytes: parseInt(process.env.MAX_FILE_SIZE || '500000'), // 100KB per file
+  maxFileSizeBytes: parseInt(process.env.MAX_FILE_SIZE || '500000'), 
 };

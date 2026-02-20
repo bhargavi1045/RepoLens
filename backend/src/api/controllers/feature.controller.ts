@@ -10,6 +10,7 @@ import { extractMermaidDiagram } from '../../utils/extractMermaidDiagram';
 import { getCache, setCache, generateCacheKey } from '../../utils/cache';
 import { runAnalysis } from '../../services/analysis.service';
 import { fetchRepoFiles } from '../../services/github.service';
+import { askRepoService } from '../../services/askRepo.service';
 
 export const analyzeRepo = async (
   req: Request,
@@ -245,3 +246,17 @@ export const getRepoFiles = async (
     next(error);
   }
 };
+
+export const askRepoController = async (req: Request, res: Response) => {
+  try {
+    const { repoUrl, prompt } = req.body;
+    if (!repoUrl || !prompt) return res.status(400).json({ error: 'Missing repoUrl or prompt' });
+
+    const answer = await askRepoService(repoUrl, prompt);
+    res.json({ answer });
+  } catch (err: any) {
+    console.error('askRepoController error:', err);
+    res.status(500).json({ error: err.message || 'Something went wrong' });
+  }
+};
+

@@ -9,6 +9,7 @@ import {
   explainWorkflow,
   generateUnitTests,
   suggestImprovements,
+  askRepoController
 } from '../controllers/feature.controller';
 
 const router = Router();
@@ -56,6 +57,12 @@ router.post(
   ensureIngested,
   validateFilePath,
   suggestImprovements
+);
+
+router.post(
+  '/ask-repo', 
+  ensureIngested,
+  askRepoController
 );
 
 export default router;

@@ -6,5 +6,6 @@ export const extractMermaidDiagram = (llmOutput: string): string => {
     throw new Error('No valid Mermaid diagram found in LLM output');
   }
 
+  // Return just the diagram code wrapped in ```mermaid for proper rendering
   return `\`\`\`mermaid\n${match[1].trim()}\n\`\`\``;
 };

@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { fetchRepoFiles } from './github.service';
 import { chunkFile, TextChunk, estimateTokens } from './chunking.service';
 import { generateEmbeddings } from './embedding.service';
@@ -26,9 +27,14 @@ export const ingestRepo = async (
     logger.info(`Force re-ingestion for ${owner}/${repo} — cleaning up old data`);
     const existingChunks = await ChunkModel.find({ repoUrl }, { pineconeId: 1 });
     const pineconeIds = existingChunks.map((c) => c.pineconeId);
-    await deleteRepoVectors(repoUrl, pineconeIds);
-    await ChunkModel.deleteMany({ repoUrl });
-    logger.info(`Cleaned up ${pineconeIds.length} old vectors and chunks`);
+
+    if (pineconeIds.length > 0) {
+      await deleteRepoVectors(repoUrl, pineconeIds); 
+      logger.info(`Deleted ${pineconeIds.length} old vectors from Pinecone`);
+    }
+
+    await ChunkModel.deleteMany({ repoUrl }); 
+    logger.info(`Deleted old chunks from MongoDB`);
   }
 
   await RepoModel.findOneAndUpdate(
@@ -73,20 +79,23 @@ export const ingestRepo = async (
     logger.info(`Total chunks: ${allChunks.length}`);
     logger.info(`Total embeddings: ${embeddings.length}`);
     logger.info(`Sample embedding length: ${embeddings[0]?.length}`);
-    logger.info(`Sample embedding type: ${typeof embeddings[0]?.[0]}`)
+    logger.info(`Sample embedding type: ${typeof embeddings[0]?.[0]}`);
 
-    const pineconeRecords: PineconeRecord[] = allChunks.map((chunk, i) => ({
-      id: `${owner}-${repo}-${chunk.metadata.filePath}-${chunk.metadata.chunkIndex}`.replace(
-        /[^a-zA-Z0-9-_]/g,
-        '_'
-      ),
-      values: embeddings[i],
-      metadata: {
-        repoUrl,
-        filePath: chunk.metadata.filePath,
-        chunkIndex: chunk.metadata.chunkIndex,
-      },
-    }));
+    const pineconeRecords: PineconeRecord[] = allChunks.map((chunk, i) => {
+      const hash = crypto.createHash('sha256').update(chunk.text).digest('hex').slice(0, 8);
+      const id = `${owner}-${repo}-${chunk.metadata.filePath}-${chunk.metadata.chunkIndex}-${hash}`
+        .replace(/[^a-zA-Z0-9-_]/g, '_');
+
+      return {
+        id,
+        values: embeddings[i],
+        metadata: {
+          repoUrl,
+          filePath: chunk.metadata.filePath,
+          chunkIndex: chunk.metadata.chunkIndex,
+        },
+      };
+    });
 
     logger.info(`Total records: ${pineconeRecords.length}`);
     logger.info(`Sample record values length: ${pineconeRecords[0]?.values?.length}`);
@@ -104,13 +113,12 @@ export const ingestRepo = async (
       endChar: chunk.metadata.endChar,
     }));
 
-    await ChunkModel.deleteMany({ repoUrl });
-    await ChunkModel.insertMany(chunkDocs);
+    await ChunkModel.insertMany(chunkDocs); // no delete here, already deleted if force=true
 
     await RepoModel.findOneAndUpdate(
       { repoUrl },
       { status: 'ingested', fileCount: files.length, ingestedAt: new Date() },
-      {returnDocument: 'after'}
+      { returnDocument: 'after' }
     );
 
     logger.info(`Ingestion complete for ${owner}/${repo} — ${allChunks.length} chunks`);
