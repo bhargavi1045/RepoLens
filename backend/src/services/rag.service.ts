@@ -47,11 +47,16 @@ export const ragQuery = async ({
     );
   }
 
-  const cacheKey = generateCacheKey(feature, repoUrl, target);
-  const cached = await getCache(cacheKey);
-  if (cached) {
-    logger.info(`Cache hit for ${feature} on ${repoUrl}`);
-    return cached;
+  // Skip caching for ask_repo feature
+  let useCache = feature !== 'ask_repo';
+  let cacheKey, cached;
+  if (useCache) {
+    cacheKey = generateCacheKey(feature, repoUrl, target);
+    cached = await getCache(cacheKey);
+    if (cached) {
+      logger.info(`Cache hit for ${feature} on ${repoUrl}`);
+      return cached;
+    }
   }
 
   logger.info(`Generating query embedding for feature: ${feature}`);
@@ -92,7 +97,9 @@ export const ragQuery = async ({
   logger.info(`Calling LLM for feature: ${feature}`);
   const response = await callLLM(prompt);
 
-  await setCache(cacheKey, feature, repoUrl, target, response);
+  if (useCache) {
+    await setCache(cacheKey, feature, repoUrl, target, response);
+  }
 
   return response;
 };

@@ -5,58 +5,66 @@
 @tailwind utilities;
 
 :root {
-  --bg: #07090f;
-  --surface: rgba(255,255,255,0.03);
-  --border: rgba(255,255,255,0.07);
-  --blue: #3b82f6;
-  --purple: #7c3aed;
-  --green: #10b981;
-  --text: #eef2ff;
-  --muted: #7c8db0;
-  --dim: #3d4a63;
+  /* Neutral mono dark base */
+  --background: 240 10% 4%;
+  --foreground: 0 0% 98%;
+
+  --card: 240 8% 9%;
+  --card-foreground: 0 0% 98%;
+
+  --border: 240 6% 20%;
+  --input: 240 6% 18%;
+
+  --muted: 240 5% 18%;
+  --muted-foreground: 240 5% 65%;
+
+  --primary: 262 83% 58%;
+  --primary-foreground: 0 0% 100%;
+
+  --ring: 262 70% 55%;
 }
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
-  background: var(--bg);
-  color: var(--text);
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
   font-family: 'Sora', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+::-webkit-scrollbar-thumb {
+  background: hsl(240 5% 20%);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(240 5% 30%);
+}
 
-.md h1,.md h2,.md h3 { color: #eef2ff; font-weight: 600; margin: 0.8rem 0 0.4rem; }
-.md h1 { font-size: 1rem; }
-.md h2 { font-size: 0.9rem; }
-.md h3 { font-size: 0.825rem; color: #a5b4fc; }
-.md p { color: #7c8db0; font-size: 0.8rem; line-height: 1.65; margin-bottom: 0.6rem; }
-.md ul,.md ol { color: #7c8db0; font-size: 0.8rem; padding-left: 1.1rem; margin-bottom: 0.6rem; }
-.md li { margin-bottom: 0.2rem; }
-.md strong { color: #c7d2fe; font-weight: 600; }
+.md h3 { font-size: 0.825rem; color: #d0d0e0; }
+.md p { color: #909099; font-size: 0.8rem; line-height: 1.65; margin-bottom: 0.6rem; }
+.md ul,.md ol { color: #909099; font-size: 0.8rem; padding-left: 1.1rem; margin-bottom: 0.6rem; }
+.md strong { color: #e0e0ea; font-weight: 600; }
 .md code {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.73rem;
-  background: rgba(99,102,241,0.12);
-  border: 1px solid rgba(99,102,241,0.2);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
   border-radius: 4px;
   padding: 0.1em 0.35em;
-  color: #a5b4fc;
+  color: #c0c0cc;
 }
 .md pre {
-  background: rgba(0,0,0,0.45);
+  background: rgba(0,0,0,0.5);
   border: 1px solid rgba(255,255,255,0.07);
   border-radius: 8px;
   padding: 0.85rem 1rem;
   overflow-x: auto;
   margin: 0.6rem 0;
 }
-.md pre code { background: none; border: none; padding: 0; color: #c9d1d9; }
-
+.md pre code { background: none; border: none; padding: 0; color: #d0d0e0; }
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }

@@ -48,8 +48,8 @@ function ResizeHandle({
           left: '50%',
           width: '1px',
           transform: 'translateX(-50%)',
-          background: active ? '#3b82f6' : 'rgba(255,255,255,0.06)',
-          boxShadow: active ? '0 0 8px 2px rgba(59,130,246,0.55)' : 'none',
+          background: active ? 'hsl(var(--primary))' : 'hsl(var(--border))',
+          boxShadow: active ? '0 0 0 1px hsl(var(--primary))' : 'none',
           transition: 'background 0.15s, box-shadow 0.15s',
         }}
       />
@@ -212,28 +212,24 @@ function DashboardContent() {
 
   if (status === 'ingesting' || status === 'fetching') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-6" style={{ background: '#07090f' }}>
-        <div className="pointer-events-none fixed inset-0">
-          <div style={{ position: 'absolute', top: '20%', left: '30%', width: 500, height: 400, background: 'radial-gradient(ellipse, rgba(59,130,246,0.12) 0%, transparent 65%)', filter: 'blur(50px)' }} />
-          <div style={{ position: 'absolute', top: '20%', right: '25%', width: 400, height: 350, background: 'radial-gradient(ellipse, rgba(124,58,237,0.1) 0%, transparent 65%)', filter: 'blur(50px)' }} />
-        </div>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-6" style={{ background: '#120f1a' }}>
         <div className="relative z-10 flex flex-col items-center gap-5">
           <div className="relative">
             <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-bold text-white"
-              style={{ background: 'linear-gradient(135deg,#3b82f6,#7c3aed)', boxShadow: '0 8px 32px rgba(124,58,237,0.35)' }}>
+              style={{ background: 'linear-gradient(135deg,#7B52AB,#C49CE0)', boxShadow: '0 8px 32px rgba(140,100,210,0.4)' }}>
               🔍
             </div>
-            <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center" style={{ background: '#07090f' }}>
-              <Loader2 size={14} className="animate-spin" style={{ color: '#60a5fa' }} />
+            <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center" style={{ background: '#120f1a' }}>
+              <Loader2 size={14} className="animate-spin" style={{ color: '#C49CE0' }} />
             </div>
           </div>
           <div className="text-center">
             <p className="text-white font-semibold text-lg mb-1">{repoName}</p>
-            <p className="text-[13px]" style={{ color: '#7c8db0' }}>{statusMsg}</p>
+            <p className="text-[13px]" style={{ color: '#7a5c9a' }}>{statusMsg}</p>
           </div>
-          <div className="w-52 h-[3px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+          <div className="w-52 h-[3px] rounded-full overflow-hidden" style={{ background: 'rgba(140,100,210,0.12)' }}>
             <div className="h-full rounded-full transition-all duration-500"
-              style={{ width: status === 'fetching' ? '75%' : '35%', background: 'linear-gradient(90deg,#3b82f6,#7c3aed)' }} />
+              style={{ width: status === 'fetching' ? '75%' : '35%', background: 'linear-gradient(90deg,#7B52AB,#C49CE0)' }} />
           </div>
         </div>
       </div>
@@ -242,21 +238,21 @@ function DashboardContent() {
 
   if (status === 'error') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ background: '#07090f' }}>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ background: '#120f1a' }}>
         <div className="flex items-center gap-2 text-red-400">
           <AlertCircle size={20} />
           <span className="font-semibold">Failed to load repository</span>
         </div>
-        <p className="text-sm max-w-md text-center" style={{ color: '#7c8db0' }}>{error}</p>
+        <p className="text-sm max-w-md text-center" style={{ color: '#7a5c9a' }}>{error}</p>
         <div className="flex gap-3">
           <button onClick={() => router.push('/')}
             className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm transition-colors hover:bg-white/5"
-            style={{ color: '#7c8db0', border: '1px solid rgba(255,255,255,0.1)' }}>
+            style={{ color: '#7a5c9a', border: '1px solid rgba(140,100,210,0.2)' }}>
             <Home size={14} /> Home
           </button>
           <button onClick={() => init(true)}
             className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-opacity hover:opacity-80"
-            style={{ background: 'linear-gradient(135deg,#3b82f6,#7c3aed)', color: 'white' }}>
+            style={{ background: 'linear-gradient(135deg,#7B52AB,#C49CE0)', color: 'white' }}>
             <RefreshCw size={14} /> Retry
           </button>
         </div>
@@ -265,30 +261,30 @@ function DashboardContent() {
   }
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden" style={{ background: '#07090f' }}>
+    <div className="flex flex-col h-screen overflow-hidden" style={{ background: '#120f1a' }}>
 
       <div className="flex items-center justify-between px-4 shrink-0"
-        style={{ background: '#060910', borderBottom: '1px solid rgba(255,255,255,0.06)', height: '44px' }}>
+        style={{ background: '#0f0c18', borderBottom: '1px solid rgba(140,100,210,0.12)', height: '44px' }}>
         <div className="flex items-center gap-3">
           <button onClick={() => router.push('/')}
             className="flex items-center gap-1.5 text-[12px] px-2 py-1 rounded-lg transition-colors hover:bg-white/5"
-            style={{ color: '#7c8db0' }}>
+            style={{ color: '#7a5c9a' }}>
             <Home size={12} /> Home
           </button>
-          <span style={{ color: 'rgba(255,255,255,0.08)', fontSize: '16px' }}>·</span>
+          <span style={{ color: 'rgba(140,100,210,0.2)', fontSize: '16px' }}>·</span>
           <div className="flex items-center gap-1.5 text-[12px]">
-            <span style={{ color: '#10b981' }}>{owner}</span>
-            <span style={{ color: '#2a3347' }}>/</span>
+            <span style={{ color: '#C49CE0' }}>{owner}</span>
+            <span style={{ color: '#2d1f45' }}>/</span>
             <span className="font-semibold text-white">{repo}</span>
           </div>
           <span className="text-[11px] px-2 py-0.5 rounded-full font-medium"
-            style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.18)', color: '#10b981' }}>
+            style={{ background: 'rgba(180,140,230,0.1)', border: '1px solid rgba(180,140,230,0.22)', color: '#C49CE0' }}>
             {files.length} files
           </span>
         </div>
         <button onClick={() => init(true)}
           className="flex items-center gap-1.5 text-[11px] px-2 py-1 rounded-lg transition-colors hover:bg-white/5"
-          style={{ color: '#3d4a63' }}>
+          style={{ color: '#4a3560' }}>
           <RefreshCw size={11} /> Re-ingest
         </button>
       </div>
@@ -296,10 +292,10 @@ function DashboardContent() {
       <div className="flex-1 overflow-hidden min-h-0">
         {isMobile ? (
           <div className="flex flex-col h-full overflow-y-auto">
-            <div style={{ minHeight: '220px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ minHeight: '220px', borderBottom: '1px solid rgba(140,100,210,0.1)' }}>
               <FileTree files={files} selectedFile={selectedFile?.path ?? null} onSelect={setSelectedFile} repoName={repoUrl} />
             </div>
-            <div style={{ minHeight: '300px', flex: '1 1 auto', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ minHeight: '300px', flex: '1 1 auto', borderBottom: '1px solid rgba(140,100,210,0.1)' }}>
               <CodeViewer file={selectedFile} />
             </div>
             <div style={{ minHeight: '320px' }}>
@@ -323,8 +319,8 @@ function DashboardContent() {
 export default function DashboardPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#07090f' }}>
-        <Loader2 size={22} className="animate-spin" style={{ color: '#60a5fa' }} />
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#120f1a' }}>
+        <Loader2 size={22} className="animate-spin" style={{ color: '#C49CE0' }} />
       </div>
     }>
       <DashboardContent />
