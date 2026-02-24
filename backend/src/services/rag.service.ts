@@ -47,7 +47,6 @@ export const ragQuery = async ({
     );
   }
 
-  // Skip caching for ask_repo feature
   let useCache = feature !== 'ask_repo';
   let cacheKey, cached;
   if (useCache) {

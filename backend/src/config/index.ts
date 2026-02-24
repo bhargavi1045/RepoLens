@@ -14,4 +14,6 @@ export const config = {
   maxFilesPerRepo: parseInt(process.env.MAX_FILES || '50'),
   maxChunksPerRepo: parseInt(process.env.MAX_CHUNKS || '2000'),
   maxFileSizeBytes: parseInt(process.env.MAX_FILE_SIZE || '500000'), 
+  jwtSecret: process.env.JWT_SECRET || 'supersecret',
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
 };

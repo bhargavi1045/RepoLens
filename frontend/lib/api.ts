@@ -1,6 +1,29 @@
 import { env } from "process";
 const BASE = process.env.BASE || 'http://localhost:5000/api';
 
+export const register = async (name: string, email: string, password: string) => {
+  const res = await fetch(`${BASE}/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email, password }),
+  });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.message || 'Registration failed');
+  return json;
+};
+
+export const login = async (email: string, password: string) => {
+  const res = await fetch(`${BASE}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.message || 'Login failed');
+  return json;
+};
+
+
 async function request<T>(path: string, body: object): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     method: 'POST',

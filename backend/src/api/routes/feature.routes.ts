@@ -60,7 +60,7 @@ router.post(
 );
 
 router.post(
-  '/ask-repo', 
+  '/ask-repo',
   ensureIngested,
   askRepoController
 );

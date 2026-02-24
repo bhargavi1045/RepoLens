@@ -260,9 +260,13 @@ function DashboardContent() {
     );
   }
 
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    router.push('/login');
+  };
+
   return (
     <div className="flex flex-col h-screen overflow-hidden" style={{ background: '#120f1a' }}>
-
       <div className="flex items-center justify-between px-4 shrink-0"
         style={{ background: '#0f0c18', borderBottom: '1px solid rgba(140,100,210,0.12)', height: '44px' }}>
         <div className="flex items-center gap-3">
@@ -282,11 +286,18 @@ function DashboardContent() {
             {files.length} files
           </span>
         </div>
-        <button onClick={() => init(true)}
-          className="flex items-center gap-1.5 text-[11px] px-2 py-1 rounded-lg transition-colors hover:bg-white/5"
-          style={{ color: '#4a3560' }}>
-          <RefreshCw size={11} /> Re-ingest
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={() => init(true)}
+            className="flex items-center gap-1.5 text-[11px] px-2 py-1 rounded-lg transition-colors hover:bg-white/5"
+            style={{ color: '#4a3560' }}>
+            <RefreshCw size={11} /> Re-ingest
+          </button>
+          <button onClick={handleLogout}
+            className="flex items-center gap-1.5 text-[11px] px-2 py-1 rounded-lg transition-colors hover:bg-white/5"
+            style={{ color: '#e08080', border: '1px solid rgba(200,80,80,0.18)' }}>
+            Logout
+          </button>
+        </div>
       </div>
 
       <div className="flex-1 overflow-hidden min-h-0">

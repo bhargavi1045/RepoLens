@@ -113,7 +113,7 @@ export const ingestRepo = async (
       endChar: chunk.metadata.endChar,
     }));
 
-    await ChunkModel.insertMany(chunkDocs); // no delete here, already deleted if force=true
+    await ChunkModel.insertMany(chunkDocs); 
 
     await RepoModel.findOneAndUpdate(
       { repoUrl },
