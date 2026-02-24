@@ -16,7 +16,8 @@ export const protect = (
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return next(new AppError('Not authorized, no token', 401));
+      next(new AppError('Not authorized, no token', 401));
+      return;
     }
 
     const token = authHeader.split(' ')[1];
