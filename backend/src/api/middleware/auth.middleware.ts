@@ -1,9 +1,9 @@
-import { Request, Response, NextFunction } from 'express';
+import * as express from 'express';
 import jwt from 'jsonwebtoken';
 import { config } from '../../config';
 import { AppError } from './errorHandler';
 
-export interface AuthRequest extends Request {
+export interface AuthRequest extends express.Request {
   user?: { 
     id: string,
     email?: string
@@ -12,8 +12,8 @@ export interface AuthRequest extends Request {
 
 export const protect = (
   req: AuthRequest,
-  res: Response,
-  next: NextFunction
+  res: express.Response,
+  next: express.NextFunction
 ): void => {
   try {
     const authHeader = req.headers.authorization;
