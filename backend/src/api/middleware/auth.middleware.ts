@@ -4,7 +4,10 @@ import { config } from '../../config';
 import { AppError } from './errorHandler';
 
 export interface AuthRequest extends Request {
-  user?: { id: string };
+  user?: { 
+    id: string,
+    email?: string
+  };
 }
 
 export const protect = (
