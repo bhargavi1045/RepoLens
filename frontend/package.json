@@ -6,7 +6,7 @@
   "license": "ISC",
   "author": "",
   "engines": {
-  "node": "18.x"
+  "node": "20.x"
   },
   "scripts": {
     "dev": "next dev",
