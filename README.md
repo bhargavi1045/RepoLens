@@ -99,8 +99,8 @@ This enables RepoLens to deliver accurate explanations grounded in the actual co
 
 ## 🚀 Deployment
 
-- **Frontend:** Deployed on Vercel  
-- **Backend:** Deployed on Render  
+- **Frontend:** Deployed on Vercel : [https://repo-lens-lime.vercel.app]
+- **Backend:** Deployed on Render  : [https://repolens-n7e4.onrender.com/]
 - **Database:** MongoDB Atlas  
 - **Vector Database:** Pinecone Cloud  
 
