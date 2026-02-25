@@ -1,5 +1,5 @@
 import { env } from "process";
-const BASE = process.env.BASE || 'http://localhost:5000/api';
+const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 export const register = async (name: string, email: string, password: string) => {
   const res = await fetch(`${BASE}/auth/register`, {

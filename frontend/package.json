@@ -5,8 +5,9 @@
   "description": "This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).",
   "license": "ISC",
   "author": "",
-  "type": "module",
-  "main": "index.js",
+  "engines": {
+  "node": "18.x"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

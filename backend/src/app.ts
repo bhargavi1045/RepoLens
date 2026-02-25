@@ -11,7 +11,6 @@ const app: Application = express();
 app.use(cors({
   origin: function (origin, callback) {
     const allowed = [
-      'http://localhost:3000',
       process.env.FRONTEND_URL,
     ].filter(Boolean);
 
