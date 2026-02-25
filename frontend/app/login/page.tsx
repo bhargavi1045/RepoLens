@@ -110,7 +110,6 @@ export default function LoginPage() {
 
           <div className="ah-divider">
             <div className="ah-divider-line" />
-            <span className="ah-divider-text">or</span>
             <div className="ah-divider-line" />
           </div>
 
