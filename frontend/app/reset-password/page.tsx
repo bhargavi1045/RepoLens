@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff, ArrowLeft, AlertCircle, Check } from 'lucide-react';
@@ -8,7 +8,7 @@ import { Eye, EyeOff, ArrowLeft, AlertCircle, Check } from 'lucide-react';
 const BASE =
   process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
-export default function ResetPassword() {
+function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
@@ -40,21 +40,11 @@ export default function ResetPassword() {
 
   const strength = getStrength(password);
 
-  const strengthLabel = [
-    'Very Weak',
-    'Weak',
-    'Fair',
-    'Good',
-    'Strong',
-  ][strength] ?? '';
+  const strengthLabel =
+    ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'][strength] ?? '';
 
-  const strengthColor = [
-    '#e03535',
-    '#e07a35',
-    '#a0c030',
-    '#35c070',
-    '#0cc070',
-  ][strength] ?? '#555';
+  const strengthColor =
+    ['#e03535', '#e07a35', '#a0c030', '#35c070', '#0cc070'][strength] ?? '#555';
 
   const handleSubmit = async () => {
     setError('');
@@ -90,7 +80,7 @@ export default function ResetPassword() {
         body: JSON.stringify({ token, password }),
       });
 
-      const data = await response.json().catch(() => ({}));
+      const data: { message?: string } = await response.json().catch(() => ({}));
 
       if (!response.ok) {
         throw new Error(data.message || 'Failed to reset password');
@@ -127,10 +117,7 @@ export default function ResetPassword() {
             <span>Back to login</span>
           </Link>
 
-          <h1
-            className="text-3xl font-bold mb-2"
-            style={{ color: '#ffffff' }}
-          >
+          <h1 className="text-3xl font-bold mb-2" style={{ color: '#ffffff' }}>
             Create New Password
           </h1>
 
@@ -150,10 +137,7 @@ export default function ResetPassword() {
             <div className="flex gap-3">
               <Check size={18} style={{ color: '#35c070' }} />
               <div>
-                <p
-                  className="font-semibold mb-1"
-                  style={{ color: '#35c070' }}
-                >
+                <p className="font-semibold mb-1" style={{ color: '#35c070' }}>
                   Password reset successful!
                 </p>
                 <p style={{ color: '#888888', fontSize: '14px' }}>
@@ -183,7 +167,7 @@ export default function ResetPassword() {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={e => setPassword(e.target.value)}
                   placeholder="Min. 8 characters"
                   disabled={loading}
                   style={{
@@ -199,7 +183,7 @@ export default function ResetPassword() {
 
                 <button
                   type="button"
-                  onClick={() => setShowPassword((p) => !p)}
+                  onClick={() => setShowPassword(p => !p)}
                   style={{
                     position: 'absolute',
                     right: 12,
@@ -211,11 +195,7 @@ export default function ResetPassword() {
                     cursor: 'pointer',
                   }}
                 >
-                  {showPassword ? (
-                    <EyeOff size={16} />
-                  ) : (
-                    <Eye size={16} />
-                  )}
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
 
@@ -223,14 +203,13 @@ export default function ResetPassword() {
               {password && (
                 <div className="mt-2">
                   <div className="flex gap-1 mb-1">
-                    {[0, 1, 2, 3, 4].map((i) => (
+                    {[0, 1, 2, 3, 4].map(i => (
                       <div
                         key={i}
                         style={{
                           flex: 1,
                           height: 4,
-                          background:
-                            i < strength ? strengthColor : '#333',
+                          background: i < strength ? strengthColor : '#333',
                           borderRadius: 2,
                         }}
                       />
@@ -256,13 +235,9 @@ export default function ResetPassword() {
                 <input
                   type={showConfirm ? 'text' : 'password'}
                   value={confirmPassword}
-                  onChange={(e) =>
-                    setConfirmPassword(e.target.value)
-                  }
+                  onChange={e => setConfirmPassword(e.target.value)}
                   disabled={loading}
-                  onKeyDown={(e) =>
-                    e.key === 'Enter' && handleSubmit()
-                  }
+                  onKeyDown={e => e.key === 'Enter' && handleSubmit()}
                   style={{
                     width: '100%',
                     padding: '10px',
@@ -276,9 +251,7 @@ export default function ResetPassword() {
 
                 <button
                   type="button"
-                  onClick={() =>
-                    setShowConfirm((p) => !p)
-                  }
+                  onClick={() => setShowConfirm(p => !p)}
                   style={{
                     position: 'absolute',
                     right: 12,
@@ -287,13 +260,10 @@ export default function ResetPassword() {
                     background: 'none',
                     border: 'none',
                     color: '#888',
+                    cursor: 'pointer',
                   }}
                 >
-                  {showConfirm ? (
-                    <EyeOff size={16} />
-                  ) : (
-                    <Eye size={16} />
-                  )}
+                  {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
             </div>
@@ -301,14 +271,15 @@ export default function ResetPassword() {
             {/* Error */}
             {error && (
               <div
-                className="mb-4 p-3 rounded-lg"
+                className="mb-4 p-3 rounded-lg flex items-center gap-2"
                 style={{
                   background: 'rgba(224, 53, 53, 0.08)',
                   border: '1px solid rgba(224, 53, 53, 0.2)',
                   color: '#e03535',
                 }}
               >
-                <AlertCircle size={14} /> {error}
+                <AlertCircle size={14} />
+                {error}
               </div>
             )}
 
@@ -322,13 +293,12 @@ export default function ResetPassword() {
                 background:
                   loading || !token
                     ? '#555'
-                    : 'linear-gradient(135deg,#ff6b00,#ff8c3a)',
+                    : 'linear-gradient(135deg, #ff6b00, #ff8c3a)',
                 color: '#fff',
                 border: 'none',
                 borderRadius: 6,
                 cursor: 'pointer',
-                opacity:
-                  loading || !token || strength < 2 ? 0.6 : 1,
+                opacity: loading || !token || strength < 2 ? 0.6 : 1,
               }}
             >
               {loading ? 'Resetting...' : 'Reset Password'}
@@ -337,5 +307,13 @@ export default function ResetPassword() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function ResetPassword() {
+  return (
+    <Suspense fallback={<div style={{ color: '#fff' }}>Loading...</div>}>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }

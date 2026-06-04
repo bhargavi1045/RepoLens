@@ -83,13 +83,9 @@ export default function ForgotPassword() {
             <div className="flex gap-3">
               <Mail size={18} style={{ color: '#35c070' }} />
               <div>
-                <p
-                  className="font-semibold mb-1"
-                  style={{ color: '#35c070' }}
-                >
+                <p className="font-semibold mb-1" style={{ color: '#35c070' }}>
                   Email sent!
                 </p>
-
                 <p style={{ color: '#888888', fontSize: '14px' }}>
                   Check your inbox for a password reset link. The link will
                   expire in 24 hours.
@@ -172,10 +168,7 @@ export default function ForgotPassword() {
         )}
 
         {/* Footer */}
-        <div
-          className="text-center text-sm"
-          style={{ color: '#555555' }}
-        >
+        <div className="text-center text-sm" style={{ color: '#555555' }}>
           <span>Remember your password? </span>
           <Link
             href="/login"

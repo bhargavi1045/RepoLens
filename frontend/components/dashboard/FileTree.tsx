@@ -24,12 +24,12 @@ interface TreeNode {
 }
 
 /* ---------------- SAFE TYPE GUARD ---------------- */
-function isFileItem(obj: any): obj is FileItem {
+function isFileItem(obj: unknown): obj is FileItem {
   return (
-    obj &&
+    obj !== null &&
     typeof obj === 'object' &&
-    typeof obj.path === 'string' &&
-    typeof obj.content === 'string'
+    typeof (obj as Record<string, unknown>).path === 'string' &&
+    typeof (obj as Record<string, unknown>).content === 'string'
   );
 }
 
@@ -170,9 +170,7 @@ function TreeItem({
         padding: `4px 8px 4px ${8 + depth * 16}px`,
         background: isSelected ? '#1a1a1a' : 'transparent',
         border: 'none',
-        borderLeft: isSelected
-          ? '2px solid #888'
-          : '2px solid transparent',
+        borderLeft: isSelected ? '2px solid #888' : '2px solid transparent',
         cursor: 'pointer',
         color: isSelected ? '#fff' : '#666',
         textAlign: 'left',
@@ -180,10 +178,7 @@ function TreeItem({
         fontFamily: "'JetBrains Mono', monospace",
       }}
     >
-      <FileText
-        size={12}
-        style={{ color: isSelected ? '#bbb' : '#444' }}
-      />
+      <FileText size={12} style={{ color: isSelected ? '#bbb' : '#444' }} />
       <span>{node.name}</span>
     </button>
   );
@@ -216,18 +211,14 @@ export default function FileTree({
   const repo = parts[1] || '';
 
   return (
-    <div
-      style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
-    >
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* HEADER */}
       <div style={{ padding: '14px' }}>
         <p style={{ color: '#aaa' }}>
           <span style={{ color: '#fff' }}>{owner}</span> /{' '}
           <span style={{ color: '#fff' }}>{repo}</span>
         </p>
-        <p style={{ fontSize: 12, color: '#555' }}>
-          {safeFiles.length} files
-        </p>
+        <p style={{ fontSize: 12, color: '#555' }}>{safeFiles.length} files</p>
       </div>
 
       {/* SEARCH */}
@@ -285,9 +276,7 @@ export default function FileTree({
               </button>
             ))
           ) : (
-            <p style={{ padding: 12, color: '#555' }}>
-              No matching files
-            </p>
+            <p style={{ padding: 12, color: '#555' }}>No matching files</p>
           )
         ) : (
           tree.map(node => (

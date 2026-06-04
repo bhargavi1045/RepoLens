@@ -116,11 +116,8 @@ function ResizablePanels({
           MIN_FILE_TREE_PCT,
           Math.min(s.left + deltaPct, 100 - MIN_CODE_PCT - s.right)
         );
-
         const newCenter = s.left + s.center - newLeft;
-
         if (newCenter < MIN_CODE_PCT) return;
-
         setSizes({ left: newLeft, center: newCenter, right: s.right });
       }
 
@@ -129,11 +126,8 @@ function ResizablePanels({
           MIN_CODE_PCT,
           Math.min(s.center + deltaPct, 100 - s.left - MIN_AI_PANEL_PCT)
         );
-
         const newRight = s.center + s.right - newCenter;
-
         if (newRight < MIN_AI_PANEL_PCT) return;
-
         setSizes({ left: s.left, center: newCenter, right: newRight });
       }
     };
@@ -164,13 +158,9 @@ function ResizablePanels({
       }}
     >
       <div style={{ width: `${sizes.left}%`, overflow: 'hidden' }}>{leftPanel}</div>
-
       <ResizeHandle onMouseDown={onMouseDownLeft} isDragging={activeDrag === 'left'} />
-
       <div style={{ width: `${sizes.center}%`, overflow: 'hidden' }}>{centerPanel}</div>
-
       <ResizeHandle onMouseDown={onMouseDownRight} isDragging={activeDrag === 'right'} />
-
       <div style={{ width: `${sizes.right}%`, overflow: 'hidden' }}>{rightPanel}</div>
     </div>
   );
@@ -192,24 +182,19 @@ function DashboardContent() {
 
   const [statusMsg, setStatusMsg] = useState('');
   const [error, setError] = useState('');
-
   const [isMobile, setIsMobile] = useState(false);
 
   /* ---------------- MOBILE DETECT ---------------- */
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 768px)');
-
     setIsMobile(mq.matches);
-
     const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-
     mq.addEventListener('change', handler);
-
     return () => mq.removeEventListener('change', handler);
   }, []);
 
-  /* ---------------- INIT (FIXED ORDER) ---------------- */
+  /* ---------------- INIT ---------------- */
 
   const init = useCallback(
     async (force = false) => {
@@ -266,7 +251,15 @@ function DashboardContent() {
 
   if (status === 'ingesting' || status === 'fetching') {
     return (
-      <div style={{ background: '#0a0a0a', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <div
+        style={{
+          background: '#0a0a0a',
+          height: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
         <Loader2 className="animate-spin" />
         <p style={{ marginLeft: 10 }}>{statusMsg}</p>
       </div>

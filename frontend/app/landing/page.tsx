@@ -25,7 +25,6 @@ export default function HomePage() {
       if (!res.ok) throw new Error('Logout failed');
       router.push('/login');
     } catch {
-      // fail silently or show toast if you want later
       router.push('/login');
     }
   };

@@ -2,16 +2,13 @@
 
 import { useState, useRef, useEffect } from 'react';
 import {
-  Send,
   FileText,
   Lightbulb,
   Code2,
   GitBranch,
   Zap,
   Loader2,
-  Bot,
   BarChart2,
-  X,
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { FileItem } from './FileTree';
@@ -90,21 +87,15 @@ function MarkdownText({ content }: { content: string }) {
 
 function MermaidBlock({ content }: { content: string }) {
   const raw = content.replace(/```mermaid|```/g, '').trim();
-
   return (
-    <pre style={{ whiteSpace: 'pre-wrap', fontSize: 13 }}>
-      {raw}
-    </pre>
+    <pre style={{ whiteSpace: 'pre-wrap', fontSize: 13 }}>{raw}</pre>
   );
 }
 
 function CodeBlock({ content }: { content: string }) {
   const raw = content.replace(/```typescript|```ts|```/g, '').trim();
-
   return (
-    <pre style={{ whiteSpace: 'pre-wrap', fontSize: 13 }}>
-      {raw}
-    </pre>
+    <pre style={{ whiteSpace: 'pre-wrap', fontSize: 13 }}>{raw}</pre>
   );
 }
 
@@ -131,6 +122,12 @@ const USER_LABELS: Record<Feature, (f?: string) => string> = {
     f ? `Suggest improvements for \`${f}\`` : 'Suggest repo-wide improvements',
   analyze: () => 'Analyze repository code quality',
 };
+
+interface AnalyzeResult {
+  healthScore: number;
+  summary: string;
+  suggestions: string[];
+}
 
 export default function AiPanel({ repoUrl, selectedFile }: AiPanelProps) {
   const repoShort = repoUrl?.replace('https://github.com/', '') || repoUrl;
@@ -163,26 +160,14 @@ export default function AiPanel({ repoUrl, selectedFile }: AiPanelProps) {
       (feature === 'explain' || feature === 'tests') &&
       !selectedFile
     ) {
-      add(
-        newMsg(
-          'assistant',
-          'Please select a file first.',
-          'plain'
-        )
-      );
+      add(newMsg('assistant', 'Please select a file first.', 'plain'));
       return;
     }
 
     setLoading(true);
     setActiveFeature(feature);
 
-    add(
-      newMsg(
-        'user',
-        USER_LABELS[feature](selectedFile?.path),
-        'plain'
-      )
-    );
+    add(newMsg('user', USER_LABELS[feature](selectedFile?.path), 'plain'));
 
     try {
       let content = '';
@@ -190,10 +175,7 @@ export default function AiPanel({ repoUrl, selectedFile }: AiPanelProps) {
 
       switch (feature) {
         case 'explain': {
-          const r = await api.explainFile(
-            repoUrl,
-            selectedFile!.path
-          );
+          const r = await api.explainFile(repoUrl, selectedFile!.path);
           content = r.explanation;
           break;
         }
@@ -212,30 +194,24 @@ export default function AiPanel({ repoUrl, selectedFile }: AiPanelProps) {
         }
 
         case 'tests': {
-          const r = await api.unitTests(
-            repoUrl,
-            selectedFile!.path
-          );
+          const r = await api.unitTests(repoUrl, selectedFile!.path);
           content = r.tests;
           contentType = 'code';
           break;
         }
 
         case 'improvements': {
-          const r = await api.improvements(
-            repoUrl,
-            selectedFile?.path
-          );
+          const r = await api.improvements(repoUrl, selectedFile?.path);
           content = r.improvements;
           break;
         }
 
         case 'analyze': {
-          const r = await api.analyze(repoUrl);
+          const r = await api.analyze(repoUrl) as AnalyzeResult;
 
-          content = `### Health Score: ${
-            r.healthScore
-          }/100\n\n${r.summary}\n\nSuggestions:\n${r.suggestions
+          content = `### Health Score: ${r.healthScore}/100\n\n${
+            r.summary
+          }\n\nSuggestions:\n${r.suggestions
             .map((s: string) => `- ${s}`)
             .join('\n')}`;
 
@@ -244,14 +220,10 @@ export default function AiPanel({ repoUrl, selectedFile }: AiPanelProps) {
       }
 
       add(newMsg('assistant', content, contentType));
-    } catch (err: any) {
-      add(
-        newMsg(
-          'assistant',
-          err?.message || 'Error occurred',
-          'plain'
-        )
-      );
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : 'Error occurred';
+      add(newMsg('assistant', message, 'plain'));
     } finally {
       setLoading(false);
       setActiveFeature(null);
@@ -269,20 +241,12 @@ export default function AiPanel({ repoUrl, selectedFile }: AiPanelProps) {
 
     try {
       const res = await api.askRepo(repoUrl, question);
-
-      const content =
-        res?.answer ??
-        'No response from server.';
-
+      const content = res?.answer ?? 'No response from server.';
       add(newMsg('assistant', content, 'markdown'));
-    } catch (err: any) {
-      add(
-        newMsg(
-          'assistant',
-          err?.message || 'Error occurred',
-          'plain'
-        )
-      );
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : 'Error occurred';
+      add(newMsg('assistant', message, 'plain'));
     } finally {
       setLoading(false);
     }
@@ -293,9 +257,7 @@ export default function AiPanel({ repoUrl, selectedFile }: AiPanelProps) {
       {/* HEADER */}
       <div style={{ padding: 12, borderBottom: '1px solid #222' }}>
         <div style={{ color: '#fff' }}>AI Assistant</div>
-        <div style={{ fontSize: 12, color: '#666' }}>
-          {repoShort}
-        </div>
+        <div style={{ fontSize: 12, color: '#666' }}>{repoShort}</div>
       </div>
 
       {/* CHAT */}
@@ -312,14 +274,50 @@ export default function AiPanel({ repoUrl, selectedFile }: AiPanelProps) {
         <div ref={bottomRef} />
       </div>
 
+      {/* FEATURE BUTTONS */}
+      <div
+        style={{
+          padding: '8px 12px',
+          borderTop: '1px solid #222',
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 6,
+        }}
+      >
+        {FEATURES.map((f) => (
+          <button
+            key={f.id}
+            onClick={() => runFeature(f.id)}
+            disabled={loading || (f.needsFile && !selectedFile)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              padding: '4px 8px',
+              background: activeFeature === f.id ? '#1a1a1a' : 'transparent',
+              border: '1px solid #333',
+              borderRadius: 4,
+              color: f.needsFile && !selectedFile ? '#444' : '#888',
+              fontSize: 12,
+              cursor:
+                loading || (f.needsFile && !selectedFile)
+                  ? 'not-allowed'
+                  : 'pointer',
+              fontFamily: "'JetBrains Mono', monospace",
+            }}
+          >
+            {f.icon}
+            {f.label}
+          </button>
+        ))}
+      </div>
+
       {/* INPUT */}
       <div style={{ padding: 12, borderTop: '1px solid #222' }}>
         <input
           value={promptInput}
           onChange={(e) => setPromptInput(e.target.value)}
-          onKeyDown={(e) =>
-            e.key === 'Enter' && handleAskRepo()
-          }
+          onKeyDown={(e) => e.key === 'Enter' && handleAskRepo()}
           placeholder="Ask..."
           style={{ width: '100%', padding: 10 }}
         />

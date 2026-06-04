@@ -3,13 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import {
-  Eye,
-  EyeOff,
-  ArrowRight,
-  Loader2,
-  Check,
-} from 'lucide-react';
+import { Eye, EyeOff, ArrowRight, Loader2 } from 'lucide-react';
 import { register } from '@/lib/api';
 
 function getStrength(pw: string): 0 | 1 | 2 | 3 | 4 {
@@ -39,6 +33,8 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
 
   const strength = getStrength(password);
+
+
 
   const inputStyle: React.CSSProperties = {
     width: '100%',
@@ -135,7 +131,7 @@ export default function RegisterPage() {
 
           {/* NAME */}
           <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
-            {[firstName, lastName].map((val, i) => (
+            {([firstName, lastName] as const).map((val, i) => (
               <input
                 key={i}
                 value={val}
@@ -186,6 +182,42 @@ export default function RegisterPage() {
             </button>
           </div>
 
+          {/* STRENGTH INDICATOR */}
+          {password && (
+            <div style={{ marginTop: -10, marginBottom: 14 }}>
+              <div style={{ display: 'flex', gap: 4, marginBottom: 4 }}>
+                {[1, 2, 3, 4].map(i => (
+                  <div
+                    key={i}
+                    style={{
+                      flex: 1,
+                      height: 3,
+                      borderRadius: 2,
+                      background: i <= strength ? STRENGTH_COLORS[strength] : '#2a2a2a',
+                    }}
+                  />
+                ))}
+              </div>
+              <p style={{ fontSize: 11, color: STRENGTH_COLORS[strength] }}>
+                {STRENGTH_LABELS[strength]}
+              </p>
+            </div>
+          }
+
+          {/* TERMS */}
+          <div style={{ marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <input
+              id="agreed"
+              type="checkbox"
+              checked={agreed}
+              onChange={e => setAgreed(e.target.checked)}
+              style={{ cursor: 'pointer' }}
+            />
+            <label htmlFor="agreed" style={{ fontSize: 12, color: '#666', cursor: 'pointer' }}>
+              I agree to the terms of service
+            </label>
+          </div>
+
           {/* SUBMIT */}
           <button
             type="submit"
@@ -217,6 +249,13 @@ export default function RegisterPage() {
             )}
           </button>
         </form>
+
+        <div style={{ textAlign: 'center', marginTop: 16, fontSize: 12, color: '#444' }}>
+          already have an account?{' '}
+          <Link href="/login" style={{ color: '#bbb' }}>
+            --login
+          </Link>
+        </div>
       </div>
     </div>
   );
