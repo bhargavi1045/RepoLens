@@ -4,3 +4,10 @@ node_modules
 dist
 *.log
 .DS_Store
+eval_basics.md
+evaluation_core.md
+implementation_summary.md
+
+
+
+

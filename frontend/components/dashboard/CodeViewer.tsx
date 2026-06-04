@@ -16,10 +16,10 @@ export default function CodeViewer({ file }: { file: FileItem | null }) {
 
   if (!file) {
     return (
-      <div className="flex flex-col items-center justify-center h-full gap-4" style={{ background: '#0e0d11', color: '#505060' }}>
-        <div className="text-7xl opacity-30 font-mono">{'< />'}</div>
-        <p className="text-[16px] font-medium" style={{ color: '#606070' }}>Select a file to view</p>
-        <p className="text-[13px]" style={{ color: '#404050' }}>Pick any file from the tree on the left</p>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', background: '#0a0a0a', gap: 12 }}>
+        <div style={{ fontSize: 56, opacity: 0.15, fontFamily: 'monospace', color: '#fff' }}>{'< />'}</div>
+        <p style={{ fontSize: 15, color: '#555' }}>Select a file to view</p>
+        <p style={{ fontSize: 12, color: '#333' }}>Pick any file from the tree on the left</p>
       </div>
     );
   }
@@ -29,36 +29,34 @@ export default function CodeViewer({ file }: { file: FileItem | null }) {
   const ext = file.path.split('.').pop() || 'txt';
 
   return (
-    <div className="flex flex-col h-full" style={{ background: '#0e0d11' }}>
-      <div className="flex items-center justify-between px-4 shrink-0"
-        style={{ background: '#111014', borderBottom: '1px solid rgba(255,255,255,0.07)', height: '48px' }}>
-        <div className="flex items-center gap-2 px-4 py-1.5 text-[14px] rounded-t-md -mb-[1px]"
-          style={{ background: '#0e0d11', border: '1px solid rgba(255,255,255,0.08)', borderBottom: '1px solid #0e0d11', color: '#e0e0ea', fontFamily: 'JetBrains Mono, monospace' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#0a0a0a' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px', background: '#111', borderBottom: '1px solid #1e1e1e', height: 48, flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 2, padding: '4px 12px', background: '#0a0a0a', border: '1px solid #1e1e1e', borderBottom: '1px solid #0a0a0a', borderRadius: '4px 4px 0 0', color: '#ddd', fontSize: 13, fontFamily: 'JetBrains Mono, monospace' }}>
           {fileName}
         </div>
-        <div className="flex items-center gap-4">
-          <span className="text-[12px] uppercase tracking-widest font-mono" style={{ color: '#404050' }}>{ext}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#444' }}>{ext}</span>
           <button onClick={handleCopy}
-            className="flex items-center gap-2 text-[13px] px-3 py-1.5 rounded transition-all hover:bg-white/5"
-            style={{ color: copied ? '#10b981' : '#606070' }}>
-            {copied ? <Check size={14} /> : <Copy size={14} />}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, padding: '6px 10px', borderRadius: 4, border: 'none', background: 'transparent', color: copied ? '#4ade80' : '#666', cursor: 'pointer', fontFamily: "'JetBrains Mono', monospace" }}
+            onMouseEnter={e => e.currentTarget.style.background = '#1a1a1a'}
+            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+            {copied ? <Check size={13} /> : <Copy size={13} />}
             {copied ? 'Copied' : 'Copy'}
           </button>
         </div>
       </div>
 
-      <div className="flex-1 overflow-auto" style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '14px', lineHeight: '1.8' }}>
-        <table className="w-full border-collapse min-w-full">
+      <div style={{ flex: 1, overflow: 'auto', fontFamily: 'JetBrains Mono, monospace', fontSize: 13, lineHeight: 1.8 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <tbody>
             {lines.map((line, i) => (
               <tr key={i}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.03)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-                <td className="text-right pr-5 pl-6 select-none sticky left-0 w-10"
-                  style={{ color: '#404050', background: '#0e0d11', minWidth: '3.8rem', userSelect: 'none', borderRight: '1px solid rgba(255,255,255,0.05)' }}>
+                onMouseEnter={e => e.currentTarget.style.background = '#111'}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                <td style={{ textAlign: 'right', paddingRight: 18, paddingLeft: 20, color: '#444', background: '#0a0a0a', minWidth: '3.5rem', userSelect: 'none', borderRight: '1px solid #1a1a1a', position: 'sticky', left: 0 }}>
                   {i + 1}
                 </td>
-                <td className="pl-6 pr-10 whitespace-pre" style={{ color: '#c8c8d4' }}>
+                <td style={{ paddingLeft: 20, paddingRight: 40, whiteSpace: 'pre', color: '#c0c0c0' }}>
                   {line || '\u00a0'}
                 </td>
               </tr>
@@ -67,10 +65,9 @@ export default function CodeViewer({ file }: { file: FileItem | null }) {
         </table>
       </div>
 
-      <div className="flex items-center justify-between px-6 shrink-0"
-        style={{ borderTop: '1px solid rgba(255,255,255,0.05)', background: '#0c0c0f', height: '32px' }}>
-        <span className="text-[12px] font-mono" style={{ color: '#404050' }}>{file.path}</span>
-        <span className="text-[12px] font-mono" style={{ color: '#404050' }}>{lines.length} lines</span>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', borderTop: '1px solid #1a1a1a', background: '#0d0d0d', height: 30, flexShrink: 0 }}>
+        <span style={{ fontSize: 11, color: '#444', fontFamily: 'monospace' }}>{file.path}</span>
+        <span style={{ fontSize: 11, color: '#444', fontFamily: 'monospace' }}>{lines.length} lines</span>
       </div>
     </div>
   );

@@ -1,76 +1,69 @@
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: 240 10% 4%;
-  --foreground: 0 0% 98%;
-
-  --card: 240 8% 9%;
-  --card-foreground: 0 0% 98%;
-
-  --border: 240 6% 20%;
-  --input: 240 6% 18%;
-
-  --muted: 240 5% 18%;
-  --muted-foreground: 240 5% 65%;
-
-  --primary: 262 83% 58%;
-  --primary-foreground: 0 0% 100%;
-
-  --ring: 262 70% 55%;
+  --background: 0 0% 4%;
+  --foreground: 0 0% 88%;
+  --card: 0 0% 6%;
+  --card-foreground: 0 0% 88%;
+  --border: 0 0% 14%;
+  --input: 0 0% 12%;
+  --muted: 0 0% 12%;
+  --muted-foreground: 0 0% 40%;
+  --primary: 0 0% 100%;
+  --primary-foreground: 0 0% 0%;
+  --ring: 0 0% 60%;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
-  background: hsl(var(--background));
-  color: hsl(var(--foreground));
-  font-family: 'Sora', sans-serif;
+  background: #0a0a0a;
+  color: #e0e0e0;
+  font-family: 'JetBrains Mono', monospace;
   -webkit-font-smoothing: antialiased;
 }
 
-::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-  background: hsl(240 5% 20%);
-  border-radius: 99px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(240 5% 30%);
-}
+::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #444; }
 
-.md h3 { font-size: 0.825rem; color: #d0d0e0; }
-.md p { color: #909099; font-size: 0.8rem; line-height: 1.65; margin-bottom: 0.6rem; }
-.md ul,.md ol { color: #909099; font-size: 0.8rem; padding-left: 1.1rem; margin-bottom: 0.6rem; }
-.md strong { color: #e0e0ea; font-weight: 600; }
+.md h3 { font-size: 0.8rem; color: #bbb; font-weight: 600; margin-bottom: 4px; }
+.md h2 { font-size: 0.9rem; color: #ddd; font-weight: 600; margin-bottom: 6px; }
+.md h1 { font-size: 1rem; color: #fff; font-weight: 600; margin-bottom: 8px; }
+.md p { color: #777; font-size: 0.8rem; line-height: 1.7; margin-bottom: 0.5rem; }
+.md ul, .md ol { color: #777; font-size: 0.8rem; padding-left: 1.1rem; margin-bottom: 0.5rem; }
+.md strong { color: #ddd; font-weight: 600; }
 .md code {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.73rem;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 4px;
+  font-size: 0.72rem;
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 3px;
   padding: 0.1em 0.35em;
-  color: #c0c0cc;
+  color: #bbb;
 }
 .md pre {
-  background: rgba(0,0,0,0.5);
-  border: 1px solid rgba(255,255,255,0.07);
-  border-radius: 8px;
-  padding: 0.85rem 1rem;
+  background: #0d0d0d;
+  border: 1px solid #222;
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
   overflow-x: auto;
-  margin: 0.6rem 0;
+  margin: 0.5rem 0;
 }
-.md pre code { background: none; border: none; padding: 0; color: #d0d0e0; }
+.md pre code { background: none; border: none; padding: 0; color: #ccc; }
+
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px); }
+  from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-.afu { animation: fadeUp 0.55s ease forwards; }
-.afi { animation: fadeIn 0.4s ease forwards; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.afu { animation: fadeUp 0.45s ease forwards; }
+.afi { animation: fadeIn 0.35s ease forwards; }
+
+.prompt::before { content: '› '; color: #888; }

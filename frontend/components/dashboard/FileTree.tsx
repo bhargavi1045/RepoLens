@@ -3,25 +3,10 @@
 import { useState } from 'react';
 import { FileText, Folder, FolderOpen, Search, ChevronRight } from 'lucide-react';
 
-export interface FileItem {
-  path: string;
-  content: string;
-}
+export interface FileItem { path: string; content: string; }
 
-interface FileTreeProps {
-  files?: FileItem[] | null | any;
-  selectedFile: string | null;
-  onSelect: (file: FileItem) => void;
-  repoName: string;
-}
-
-interface TreeNode {
-  name: string;
-  path: string;
-  type: 'file' | 'folder';
-  children?: TreeNode[];
-  content?: string;
-}
+interface FileTreeProps { files?: FileItem[] | null | any; selectedFile: string | null; onSelect: (file: FileItem) => void; repoName: string; }
+interface TreeNode { name: string; path: string; type: 'file' | 'folder'; children?: TreeNode[]; content?: string; }
 
 function normalizeFiles(raw: any): FileItem[] {
   if (!raw) return [];
@@ -41,16 +26,9 @@ function buildTree(files: FileItem[]): TreeNode[] {
       const part = parts[i];
       const isFile = i === parts.length - 1;
       const existing = current.find(n => n.name === part);
-      if (existing) {
-        if (!isFile && existing.children) current = existing.children;
-      } else {
-        const node: TreeNode = {
-          name: part,
-          path: parts.slice(0, i + 1).join('/'),
-          type: isFile ? 'file' : 'folder',
-          children: isFile ? undefined : [],
-          content: isFile ? file.content : undefined,
-        };
+      if (existing) { if (!isFile && existing.children) current = existing.children; }
+      else {
+        const node: TreeNode = { name: part, path: parts.slice(0, i + 1).join('/'), type: isFile ? 'file' : 'folder', children: isFile ? undefined : [], content: isFile ? file.content : undefined };
         current.push(node);
         if (!isFile && node.children) current = node.children;
       }
@@ -59,34 +37,20 @@ function buildTree(files: FileItem[]): TreeNode[] {
   return root;
 }
 
-function getFileColor(name: string): string {
-  if (name.endsWith('.ts') || name.endsWith('.tsx')) return '#a0a0b0';
-  if (name.endsWith('.js') || name.endsWith('.jsx')) return '#a0a0b0';
-  if (name.endsWith('.json')) return '#909090';
-  if (name.endsWith('.md')) return '#909090';
-  if (name.endsWith('.css')) return '#a0a0b0';
-  return '#707080';
-}
-
-function TreeItem({
-  node, depth, selectedFile, onSelect,
-}: {
-  node: TreeNode; depth: number; selectedFile: string | null; onSelect: (file: FileItem) => void;
-}) {
+function TreeItem({ node, depth, selectedFile, onSelect }: { node: TreeNode; depth: number; selectedFile: string | null; onSelect: (file: FileItem) => void }) {
   const [open, setOpen] = useState(depth < 1);
   const isSelected = node.path === selectedFile;
 
   if (node.type === 'folder') {
     return (
       <div>
-        <button
-          onClick={() => setOpen(!open)}
-          className="w-full flex items-center gap-1.5 py-1 rounded text-left transition-colors hover:bg-white/[0.04] text-[14px]"
-          style={{ paddingLeft: `${8 + depth * 16}px`, color: '#c0c0cc' }}
-        >
-          <ChevronRight size={12} className={`shrink-0 transition-transform ${open ? 'rotate-90' : ''}`} />
-          {open ? <FolderOpen size={15} style={{ color: '#d0d0e0' }} /> : <Folder size={15} style={{ color: '#d0d0e0' }} />}
-          <span className="truncate font-medium">{node.name}</span>
+        <button onClick={() => setOpen(!open)}
+          style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 6, padding: `4px 8px 4px ${8 + depth * 16}px`, background: 'transparent', border: 'none', cursor: 'pointer', color: '#999', textAlign: 'left', fontSize: 13, fontFamily: "'JetBrains Mono', monospace" }}
+          onMouseEnter={e => e.currentTarget.style.background = '#111'}
+          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+          <ChevronRight size={12} style={{ flexShrink: 0, transition: 'transform 0.15s', transform: open ? 'rotate(90deg)' : 'rotate(0deg)', color: '#555' }} />
+          {open ? <FolderOpen size={14} style={{ color: '#888' }} /> : <Folder size={14} style={{ color: '#888' }} />}
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 500 }}>{node.name}</span>
         </button>
         {open && node.children?.map(child => (
           <TreeItem key={child.path} node={child} depth={depth + 1} selectedFile={selectedFile} onSelect={onSelect} />
@@ -98,75 +62,68 @@ function TreeItem({
   if (!node.content) return null;
 
   return (
-    <button
-      onClick={() => onSelect({ path: node.path, content: node.content! })}
-      className="w-full flex items-center gap-1.5 py-1 rounded text-left text-[14px] transition-all"
+    <button onClick={() => onSelect({ path: node.path, content: node.content! })}
       style={{
-        paddingLeft: `${8 + depth * 16}px`,
-        color: isSelected ? '#ffffff' : '#909099',
-        background: isSelected ? 'rgba(140,100,210,0.18)' : 'transparent',
+        width: '100%', display: 'flex', alignItems: 'center', gap: 6,
+        padding: `4px 8px 4px ${8 + depth * 16}px`,
+        background: isSelected ? '#1a1a1a' : 'transparent',
+        border: 'none', borderLeft: isSelected ? '2px solid #888' : '2px solid transparent',
+        cursor: 'pointer', color: isSelected ? '#fff' : '#666', textAlign: 'left', fontSize: 13,
+        fontFamily: "'JetBrains Mono', monospace", transition: 'all 0.1s',
       }}
-      onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
-      onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = 'transparent'; }}
-    >
-      <FileText size={13} className="shrink-0" style={{ color: getFileColor(node.name) }} />
-      <span className="truncate">{node.name}</span>
+      onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = '#111'; }}
+      onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = 'transparent'; }}>
+      <FileText size={12} style={{ flexShrink: 0, color: isSelected ? '#bbb' : '#444' }} />
+      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{node.name}</span>
     </button>
   );
 }
 
 export default function FileTree({ files, selectedFile, onSelect, repoName }: FileTreeProps) {
   const [search, setSearch] = useState('');
-
   const safeFiles = normalizeFiles(files);
   const tree = buildTree(safeFiles);
-  const filtered = search.trim()
-    ? safeFiles.filter(f => f.path.toLowerCase().includes(search.toLowerCase()))
-    : [];
-
+  const filtered = search.trim() ? safeFiles.filter(f => f.path.toLowerCase().includes(search.toLowerCase())) : [];
   const parts = repoName.replace('https://github.com/', '').split('/');
   const owner = parts[0] || '';
   const repo  = parts[1] || '';
 
   return (
-    <div className="flex flex-col h-full select-none" style={{ background: '#0e0d11' }}>
-      <div className="px-4 pt-4 pb-3 border-b shrink-0" style={{ borderColor: 'rgba(255,255,255,0.07)' }}>
-        <p className="text-[15px] font-medium truncate">
-          <span style={{ color: '#9B72CF' }}>{owner}</span>
-          <span style={{ color: '#505060' }}> / </span>
-          <span className="text-white font-semibold">{repo}</span>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', userSelect: 'none', background: '#0a0a0a' }}>
+      <div style={{ padding: '14px 14px 10px', borderBottom: '1px solid #1a1a1a', flexShrink: 0 }}>
+        <p style={{ fontSize: 14, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <span style={{ color: '#aaa' }}>{owner}</span>
+          <span style={{ color: '#444' }}> / </span>
+          <span style={{ color: '#fff', fontWeight: 600 }}>{repo}</span>
         </p>
-        <p className="text-[13px] mt-0.5" style={{ color: '#606070' }}>{safeFiles.length} files</p>
+        <p style={{ fontSize: 12, marginTop: 2, color: '#444' }}>{safeFiles.length} files</p>
       </div>
 
-      <div className="px-2.5 py-2.5 border-b shrink-0" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
-        <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.05)' }}>
-          <Search size={13} style={{ color: '#606070' }} />
-          <input
-            suppressHydrationWarning
-            type="text"
-            placeholder="Search files..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="bg-transparent text-[13px] outline-none flex-1"
-            style={{ color: '#c0c0cc' }}
-          />
+      <div style={{ padding: '8px 10px', borderBottom: '1px solid #1a1a1a', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 10px', background: '#111', border: '1px solid #1e1e1e', borderRadius: 6 }}>
+          <Search size={12} style={{ color: '#555', flexShrink: 0 }} />
+          <input suppressHydrationWarning type="text" placeholder="Search files..." value={search} onChange={e => setSearch(e.target.value)}
+            style={{ background: 'transparent', border: 'none', outline: 'none', fontSize: 12, color: '#ccc', flex: 1, fontFamily: "'JetBrains Mono', monospace" }} />
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto py-1.5 px-1.5">
+      <div style={{ flex: 1, overflowY: 'auto', padding: '4px 4px' }}>
         {safeFiles.length === 0 ? (
-          <p className="text-[13px] text-center mt-6" style={{ color: '#505060' }}>No files loaded</p>
+          <p style={{ fontSize: 12, textAlign: 'center', marginTop: 24, color: '#444' }}>No files loaded</p>
         ) : filtered.length > 0 ? (
           filtered.map(file => (
-            <button
-              key={file.path}
-              onClick={() => onSelect(file)}
-              className="w-full flex items-center gap-2 px-2.5 py-1.5 text-left text-[13px] rounded transition-colors hover:bg-white/[0.04]"
-              style={{ color: file.path === selectedFile ? '#ffffff' : '#909099' }}
-            >
-              <FileText size={13} style={{ color: getFileColor(file.path) }} />
-              <span className="truncate">{file.path}</span>
+            <button key={file.path} onClick={() => onSelect(file)}
+              style={{
+                width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '5px 10px',
+                background: file.path === selectedFile ? '#1a1a1a' : 'transparent',
+                border: 'none', borderLeft: file.path === selectedFile ? '2px solid #888' : '2px solid transparent',
+                cursor: 'pointer', color: file.path === selectedFile ? '#fff' : '#666', textAlign: 'left', fontSize: 12,
+                fontFamily: "'JetBrains Mono', monospace",
+              }}
+              onMouseEnter={e => { if (file.path !== selectedFile) e.currentTarget.style.background = '#111'; }}
+              onMouseLeave={e => { if (file.path !== selectedFile) e.currentTarget.style.background = 'transparent'; }}>
+              <FileText size={12} style={{ color: '#444', flexShrink: 0 }} />
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{file.path}</span>
             </button>
           ))
         ) : (
