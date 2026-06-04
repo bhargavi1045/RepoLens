@@ -23,15 +23,20 @@ interface TreeNode {
   content?: string;
 }
 
-
+/* ---------------- SAFE TYPE GUARD ---------------- */
 function isFileItem(obj: any): obj is FileItem {
-  return obj && typeof obj === 'object' && typeof obj.path === 'string';
+  return (
+    obj &&
+    typeof obj === 'object' &&
+    typeof obj.path === 'string' &&
+    typeof obj.content === 'string'
+  );
 }
 
+/* ---------------- NORMALIZE INPUT ---------------- */
 function normalizeFiles(raw: unknown): FileItem[] {
   if (!raw || typeof raw !== 'object') return [];
 
-  // direct array
   if (Array.isArray(raw)) {
     return raw.filter(isFileItem);
   }
@@ -49,6 +54,7 @@ function normalizeFiles(raw: unknown): FileItem[] {
   return [];
 }
 
+/* ---------------- BUILD TREE ---------------- */
 function buildTree(files: FileItem[]): TreeNode[] {
   const root: TreeNode[] = [];
 
@@ -58,18 +64,13 @@ function buildTree(files: FileItem[]): TreeNode[] {
     const parts = file.path.split('/');
     let current = root;
 
-    for (let i = 0; i < parts.length; i++) {
-      const part = parts[i];
+    parts.forEach((part, i) => {
       const isFile = i === parts.length - 1;
 
-      const existing = current.find(n => n.name === part);
+      let existing = current.find(n => n.name === part);
 
-      if (existing) {
-        if (!isFile && existing.children) {
-          current = existing.children;
-        }
-      } else {
-        const node: TreeNode = {
+      if (!existing) {
+        existing = {
           name: part,
           path: parts.slice(0, i + 1).join('/'),
           type: isFile ? 'file' : 'folder',
@@ -77,19 +78,19 @@ function buildTree(files: FileItem[]): TreeNode[] {
           content: isFile ? file.content : undefined,
         };
 
-        current.push(node);
-
-        if (!isFile && node.children) {
-          current = node.children;
-        }
+        current.push(existing);
       }
-    }
+
+      if (!isFile && existing.children) {
+        current = existing.children;
+      }
+    });
   }
 
   return root;
 }
 
-
+/* ---------------- TREE ITEM ---------------- */
 function TreeItem({
   node,
   depth,
@@ -127,9 +128,8 @@ function TreeItem({
           <ChevronRight
             size={12}
             style={{
-              flexShrink: 0,
-              transition: 'transform 0.15s',
               transform: open ? 'rotate(90deg)' : 'rotate(0deg)',
+              transition: 'transform 0.15s',
               color: '#555',
             }}
           />
@@ -159,7 +159,9 @@ function TreeItem({
 
   return (
     <button
-      onClick={() => onSelect({ path: node.path, content: node.content! })}
+      onClick={() =>
+        onSelect({ path: node.path, content: node.content! })
+      }
       style={{
         width: '100%',
         display: 'flex',
@@ -168,7 +170,9 @@ function TreeItem({
         padding: `4px 8px 4px ${8 + depth * 16}px`,
         background: isSelected ? '#1a1a1a' : 'transparent',
         border: 'none',
-        borderLeft: isSelected ? '2px solid #888' : '2px solid transparent',
+        borderLeft: isSelected
+          ? '2px solid #888'
+          : '2px solid transparent',
         cursor: 'pointer',
         color: isSelected ? '#fff' : '#666',
         textAlign: 'left',
@@ -176,12 +180,16 @@ function TreeItem({
         fontFamily: "'JetBrains Mono', monospace",
       }}
     >
-      <FileText size={12} style={{ color: isSelected ? '#bbb' : '#444' }} />
+      <FileText
+        size={12}
+        style={{ color: isSelected ? '#bbb' : '#444' }}
+      />
       <span>{node.name}</span>
     </button>
   );
 }
 
+/* ---------------- MAIN COMPONENT ---------------- */
 export default function FileTree({
   files,
   selectedFile,
@@ -193,50 +201,94 @@ export default function FileTree({
   const safeFiles = normalizeFiles(files);
   const tree = buildTree(safeFiles);
 
-  const filtered = search.trim()
-    ? safeFiles.filter(f =>
-        f.path.toLowerCase().includes(search.toLowerCase())
-      )
-    : [];
+  const filteredFiles =
+    search.trim().length > 0
+      ? safeFiles.filter(f =>
+          f.path.toLowerCase().includes(search.toLowerCase())
+        )
+      : [];
 
-  const parts = repoName.replace('https://github.com/', '').split('/');
+  const parts = repoName
+    ?.replace('https://github.com/', '')
+    ?.split('/') ?? [];
+
   const owner = parts[0] || '';
   const repo = parts[1] || '';
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <div
+      style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+    >
+      {/* HEADER */}
       <div style={{ padding: '14px' }}>
-        <p>
-          <span>{owner}</span> / <span>{repo}</span>
+        <p style={{ color: '#aaa' }}>
+          <span style={{ color: '#fff' }}>{owner}</span> /{' '}
+          <span style={{ color: '#fff' }}>{repo}</span>
         </p>
-        <p>{safeFiles.length} files</p>
+        <p style={{ fontSize: 12, color: '#555' }}>
+          {safeFiles.length} files
+        </p>
       </div>
 
+      {/* SEARCH */}
       <div style={{ padding: '8px 10px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Search size={12} />
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            border: '1px solid #222',
+            padding: '6px 8px',
+            borderRadius: 4,
+          }}
+        >
+          <Search size={12} color="#666" />
           <input
             type="text"
             placeholder="Search files..."
             value={search}
             onChange={e => setSearch(e.target.value)}
+            style={{
+              flex: 1,
+              background: 'transparent',
+              border: 'none',
+              outline: 'none',
+              color: '#ccc',
+              fontSize: 13,
+              fontFamily: "'JetBrains Mono', monospace",
+            }}
           />
         </div>
       </div>
 
+      {/* TREE */}
       <div style={{ flex: 1, overflowY: 'auto' }}>
         {safeFiles.length === 0 ? (
-          <p>No files loaded</p>
-        ) : filtered.length > 0 ? (
-          filtered.map(file => (
-            <button
-              key={file.path}
-              onClick={() => onSelect(file)}
-            >
-              <FileText size={12} />
-              <span>{file.path}</span>
-            </button>
-          ))
+          <p style={{ padding: 12, color: '#555' }}>No files loaded</p>
+        ) : search.trim() ? (
+          filteredFiles.length > 0 ? (
+            filteredFiles.map(file => (
+              <button
+                key={file.path}
+                onClick={() => onSelect(file)}
+                style={{
+                  width: '100%',
+                  textAlign: 'left',
+                  padding: '6px 10px',
+                  background: '#111',
+                  border: 'none',
+                  color: '#ccc',
+                  cursor: 'pointer',
+                }}
+              >
+                <FileText size={12} /> {file.path}
+              </button>
+            ))
+          ) : (
+            <p style={{ padding: 12, color: '#555' }}>
+              No matching files
+            </p>
+          )
         ) : (
           tree.map(node => (
             <TreeItem
