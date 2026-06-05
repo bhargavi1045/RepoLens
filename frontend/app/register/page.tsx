@@ -34,8 +34,6 @@ export default function RegisterPage() {
 
   const strength = getStrength(password);
 
-
-
   const inputStyle: React.CSSProperties = {
     width: '100%',
     padding: '9px 10px 9px 26px',
@@ -202,7 +200,7 @@ export default function RegisterPage() {
                 {STRENGTH_LABELS[strength]}
               </p>
             </div>
-          }
+          )}
 
           {/* TERMS */}
           <div style={{ marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
