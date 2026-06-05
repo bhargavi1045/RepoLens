@@ -152,10 +152,6 @@ npm run eval <repo-url>        # Evaluate your repository
 - Comparison of fixed-size vs AST-based chunking strategies
 - Detailed findings and recommendations
 
-**Documentation:**
-- **Quick Start:** [backend/EVAL_QUICKSTART.md](./backend/EVAL_QUICKSTART.md) — Get results in 5 minutes
-- **Full Guide:** [backend/EVALUATION_GUIDE.md](./backend/EVALUATION_GUIDE.md) — Architecture, metrics, and research applications
-
 This evaluation layer makes RepoLens research-ready, enabling you to:
 - Compare chunking strategies empirically
 - Measure generation faithfulness
@@ -185,7 +181,7 @@ Unlike basic AI code explainers, RepoLens:
 
 ---
 
-Made with passion by Bhargavi💜
+Made with passion by Bhargavi
 
 Got ideas, improvements, or cool features in mind?  
 Feel free to open an issue or submit a pull request 
