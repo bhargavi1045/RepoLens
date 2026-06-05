@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
+import { useState, useLayoutEffect, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import FileTree, { FileItem } from '@/components/dashboard/FileTree';
 import CodeViewer from '@/components/dashboard/CodeViewer';
@@ -186,7 +186,7 @@ function DashboardContent() {
 
   /* ---------------- MOBILE DETECT ---------------- */
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const mq = window.matchMedia('(max-width: 768px)');
     setIsMobile(mq.matches);
     const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
@@ -220,11 +220,17 @@ function DashboardContent() {
         setFiles(fileList);
         setStatus('ready');
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : 'Something went wrong.');
+        const message = err instanceof Error ? err.message : 'Something went wrong.';
+        // Redirect to login on auth errors
+        if (message.includes('401') || message.toLowerCase().includes('unauthorized')) {
+          router.push('/login');
+          return;
+        }
+        setError(message);
         setStatus('error');
       }
     },
-    [repoUrl]
+    [repoUrl, router]
   );
 
   /* ---------------- EFFECT ---------------- */
@@ -234,8 +240,8 @@ function DashboardContent() {
       router.push('/');
       return;
     }
-    init();
-  }, [repoUrl, router, init]);
+    void init();
+  }, [repoUrl, router]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ---------------- UI HELPERS ---------------- */
 
